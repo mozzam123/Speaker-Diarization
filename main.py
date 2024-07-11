@@ -1,27 +1,48 @@
+import time
+import os
 import librosa
+import soundfile as sf
 from pyannote.audio import Pipeline
-from pyannote.core import Segment
-from pyannote.audio import Audio
+
+# Function to save audio segment to .wav file
+def save_audio_segment(segment, audio_path, output_dir, speaker_label):
+    start, end = segment.start, segment.end
+    print("start: ", start)
+    print("end: ", end)
+    y, sr = librosa.load(audio_path, sr=None, offset=start, duration=end-start)
+    output_path = os.path.join(output_dir, f"{speaker_label}_{start:.2f}_{end:.2f}.wav")
+    sf.write(output_path, y, sr)
 
 # Path to your audio file
-audio_path = 'voice_data.wav'
+audio_path = 'audio_files/voice1.wav'
 
 # Load the audio file using librosa
 y, sr = librosa.load(audio_path, sr=None)
 
 # Obtain your Hugging Face token and make sure you've accepted the conditions on the model page
-# Replace 'YOUR_AUTH_TOKEN' with your actual token
 use_auth_token = "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"
 
 # Load the speaker diarization pipeline
 pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization", use_auth_token=use_auth_token)
 
 # Perform diarization on the whole audio file
+start_time = time.time()
 diarization_result = pipeline(audio_path)
-print(diarization_result)
+end_time = time.time()
 
-# Perform diarization on an excerpt of the audio
-excerpt = Segment(start=2.0, end=5.0)
-waveform, sample_rate = Audio().crop(audio_path, excerpt)
-excerpt_diarization_result = pipeline({"waveform": waveform, "sample_rate": sample_rate})
-print(excerpt_diarization_result)
+# Print the result and the time taken
+print(diarization_result)
+print(f"Time taken for diarization: {end_time - start_time} seconds")
+
+# Create a directory to save speaker audio segments
+output_dir = 'speaker_segments'
+os.makedirs(output_dir, exist_ok=True)
+
+# Iterate over each speaker segment and save to .wav file
+for turn, _, speaker in diarization_result.itertracks(yield_label=True):
+    print("turn: ", turn)
+    print("_: ", _)
+    print("speaker: ", speaker)
+    save_audio_segment(turn, audio_path, output_dir, speaker)
+
+print("Speaker diarization completed and segments saved successfully.")
