@@ -32,7 +32,7 @@ end_time = time.time()
 
 # Print the result and the time taken
 print(diarization_result)
-print(f"Time taken for diarization: {end_time - start_time} seconds")
+# print(f"Time taken for diarization: {end_time - start_time} seconds")
 
 # Create a directory to save speaker audio segments
 output_dir = 'speaker_segments'
@@ -40,9 +40,9 @@ os.makedirs(output_dir, exist_ok=True)
 
 # Iterate over each speaker segment and save to .wav file
 for turn, _, speaker in diarization_result.itertracks(yield_label=True):
-    print("turn: ", turn)
-    print("_: ", _)
-    print("speaker: ", speaker)
+    # print("turn: ", turn)
+    # print("_: ", _)
+    # print("speaker: ", speaker)
     save_audio_segment(turn, audio_path, output_dir, speaker)
 
 print("Speaker diarization completed and segments saved successfully.")
