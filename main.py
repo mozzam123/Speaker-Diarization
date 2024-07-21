@@ -45,4 +45,4 @@ for turn, _, speaker in diarization_result.itertracks(yield_label=True):
     # print("speaker: ", speaker)
     save_audio_segment(turn, audio_path, output_dir, speaker)
 
-# print("Speaker diarization completed and segments saved successfully.")
+print("Speaker diarization completed and segments saved successfully.")
